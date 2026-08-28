@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>ABELDB Cybersecurity | Verificación de Certificados</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f7f9fc;
+            color: #10243e;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 30px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 850px;
+            background: white;
+            border: 1px solid #e3e8ef;
+            padding: 60px;
+            text-align: center;
+        }
+
+        .brand {
+            margin-bottom: 50px;
+        }
+
+        .brand-name {
+            font-size: 34px;
+            font-weight: 700;
+            letter-spacing: 8px;
+            color: #10243e;
+        }
+
+        .brand-subtitle {
+            margin-top: 12px;
+            font-size: 13px;
+            letter-spacing: 6px;
+            color: #40536d;
+        }
+
+        .line {
+            width: 70px;
+            height: 3px;
+            background: #5875ff;
+            margin: 20px auto 0;
+        }
+
+        h1 {
+            font-size: 32px;
+            letter-spacing: 3px;
+            margin-bottom: 15px;
+        }
+
+        .description {
+            color: #66758a;
+            font-size: 16px;
+            line-height: 1.7;
+            margin-bottom: 35px;
+        }
+
+        .search-box {
+            display: flex;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        input {
+            flex: 1;
+            padding: 16px;
+            border: 1px solid #ccd4df;
+            font-size: 15px;
+            outline: none;
+        }
+
+        input:focus {
+            border-color: #5875ff;
+        }
+
+        button {
+            padding: 16px 25px;
+            border: none;
+            background: #10243e;
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #1b3657;
+        }
+
+        .result {
+            display: none;
+            margin-top: 40px;
+            padding: 30px;
+            border: 1px solid #dfe5ec;
+            text-align: left;
+        }
+
+        .valid {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 25px;
+        }
+
+        .data {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .data-item span {
+            display: block;
+            color: #738198;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+        }
+
+        .data-item strong {
+            font-size: 16px;
+        }
+
+        footer {
+            margin-top: 45px;
+            font-size: 12px;
+            color: #8995a5;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 35px 20px;
+            }
+
+            .brand-name {
+                font-size: 25px;
+                letter-spacing: 5px;
+            }
+
+            h1 {
+                font-size: 25px;
+            }
+
+            .search-box {
+                flex-direction: column;
+            }
+
+            button {
+                margin-top: 10px;
+            }
+
+            .data {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <main class="container">
+
+        <header class="brand">
+            <div class="brand-name">ABELDB</div>
+            <div class="brand-subtitle">CYBERSECURITY</div>
+            <div class="line"></div>
+        </header>
+
+        <h1>VERIFICACIÓN DE CERTIFICADOS</h1>
+
+        <p class="description">
+            Introduce el número de certificado para comprobar
+            su autenticidad y los datos asociados.
+        </p>
+
+        <div class="search-box">
+            <input
+                type="text"
+                id="certificateInput"
+                placeholder="Ej. ABELDB-LNX-2026-0001"
+            >
+
+            <button onclick="verifyCertificate()">
+                VERIFICAR
+            </button>
+        </div>
+
+        <section class="result" id="result">
+
+            <div class="valid">
+                CERTIFICADO VÁLIDO
+            </div>
+
+            <div class="data">
+
+                <div class="data-item">
+                    <span>Participante</span>
+                    <strong id="student"></strong>
+                </div>
+
+                <div class="data-item">
+                    <span>Curso</span>
+                    <strong id="course"></strong>
+                </div>
+
+                <div class="data-item">
+                    <span>Duración</span>
+                    <strong id="duration"></strong>
+                </div>
+
+                <div class="data-item">
+                    <span>Modalidad</span>
+                    <strong id="modality"></strong>
+                </div>
+
+                <div class="data-item">
+                    <span>Fecha de finalización</span>
+                    <strong id="date"></strong>
+                </div>
+
+                <div class="data-item">
+                    <span>N.º de certificado</span>
+                    <strong id="certificateNumber"></strong>
+                </div>
+
+            </div>
+
+        </section>
+
+        <footer>
+            ABELDB Cybersecurity · Sistema de verificación de certificados
+        </footer>
+
+    </main>
+
+    <script>
+
+        const certificates = {
+
+            "ABELDB-LNX-2026-0001": {
+                student: "CERTIFICADO DE PRUEBA",
+                course: "Linux Básico desde Cero",
+                duration: "24 horas",
+                modality: "Online",
+                date: "28/08/2026"
+            }
+
+        };
+
+        function verifyCertificate() {
+
+            const input = document
+                .getElementById("certificateInput")
+                .value
+                .trim()
+                .toUpperCase();
+
+            const result = document.getElementById("result");
+
+            if (certificates[input]) {
+
+                const certificate = certificates[input];
+
+                document.getElementById("student").textContent =
+                    certificate.student;
+
+                document.getElementById("course").textContent =
+                    certificate.course;
+
+                document.getElementById("duration").textContent =
+                    certificate.duration;
+
+                document.getElementById("modality").textContent =
+                    certificate.modality;
+
+                document.getElementById("date").textContent =
+                    certificate.date;
+
+                document.getElementById("certificateNumber").textContent =
+                    input;
+
+                result.style.display = "block";
+
+            } else {
+
+                result.style.display = "block";
+
+                result.innerHTML = `
+                    <div class="valid">
+                        CERTIFICADO NO ENCONTRADO
+                    </div>
+
+                    <p>
+                        No existe un certificado registrado con el número:
+                        <strong>${input}</strong>
+                    </p>
+                `;
+            }
+        }
+
+    </script>
+
+</body>
+</html>
