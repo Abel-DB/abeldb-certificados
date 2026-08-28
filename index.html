@@ -313,6 +313,22 @@
             }
         }
 
+        window.addEventListener("DOMContentLoaded", function () {
+
+            const params = new URLSearchParams(window.location.search);
+            const certificateId = params.get("id");
+
+            if (certificateId) {
+
+                const input = document.getElementById("certificateInput");
+
+                input.value = certificateId;
+
+                verifyCertificate();
+            }
+
+        });
+
     </script>
 
 </body>
