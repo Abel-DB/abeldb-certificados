@@ -250,17 +250,43 @@
 
     <script>
 
-        const certificates = {
+        let certificates = {};
 
-            "ABELDB-LNX-2026-0001": {
-                student: "CERTIFICADO DE PRUEBA",
-                course: "Linux Básico desde Cero",
-                duration: "24 horas",
-                modality: "Online",
-                date: "28/08/2026"
+        async function loadCertificates() {
+
+            try {
+
+                const response = await fetch("certificados.json");
+
+                if (!response.ok) {
+                    throw new Error("No se pudo cargar el registro de certificados.");
+                }
+
+                certificates = await response.json();
+
+                checkUrlCertificate();
+
+            } catch (error) {
+
+                console.error(error);
+
+                const result = document.getElementById("result");
+
+                result.style.display = "block";
+
+                result.innerHTML = `
+                    <div class="valid">
+                        ERROR DEL SISTEMA
+                    </div>
+
+                    <p>
+                        No fue posible cargar el registro de certificados.
+                        Intenta nuevamente más tarde.
+                    </p>
+                `;
             }
+        }
 
-        };
 
         function verifyCertificate() {
 
@@ -272,24 +298,82 @@
 
             const result = document.getElementById("result");
 
-            if (certificates[input]) {
+            if (!input) {
 
+                result.style.display = "block";
+
+                result.innerHTML = `
+                    <div class="valid">
+                        INGRESA UN NÚMERO DE CERTIFICADO
+                    </div>
+
+                    <p>
+                        Introduce el número de certificado para realizar la verificación.
+                    </p>
+                `;
+
+                return;
+            }
+
+
+            if (certificates[input]) {
+    
                 const certificate = certificates[input];
 
+                result.innerHTML = `
+                    <div class="valid">
+                        CERTIFICADO VÁLIDO
+                    </div>
+
+                    <div class="data">
+
+                        <div class="data-item">
+                            <span>Participante</span>
+                            <strong id="student"></strong>
+                        </div>
+
+                        <div class="data-item">
+                            <span>Curso</span>
+                            <strong id="course"></strong>
+                        </div>
+
+                        <div class="data-item">
+                            <span>Duración</span>
+                            <strong id="duration"></strong>
+                        </div>
+
+                        <div class="data-item">
+                            <span>Modalidad</span>
+                            <strong id="modality"></strong>
+                        </div>
+
+                        <div class="data-item">
+                            <span>Fecha de finalización</span>
+                            <strong id="date"></strong>
+                        </div>
+
+                        <div class="data-item">
+                            <span>N.º de certificado</span>
+                            <strong id="certificateNumber"></strong>
+                        </div>
+
+                    </div>
+                `;
+
                 document.getElementById("student").textContent =
-                    certificate.student;
+                    certificate.nombre;
 
                 document.getElementById("course").textContent =
-                    certificate.course;
+                    certificate.curso;
 
                 document.getElementById("duration").textContent =
-                    certificate.duration;
+                    certificate.duracion;
 
                 document.getElementById("modality").textContent =
-                    certificate.modality;
+                    certificate.modalidad;
 
                 document.getElementById("date").textContent =
-                    certificate.date;
+                    certificate.fecha;
 
                 document.getElementById("certificateNumber").textContent =
                     input;
@@ -297,7 +381,7 @@
                 result.style.display = "block";
 
             } else {
-
+    
                 result.style.display = "block";
 
                 result.innerHTML = `
@@ -307,27 +391,55 @@
 
                     <p>
                         No existe un certificado registrado con el número:
-                        <strong>${input}</strong>
+                        <strong>${escapeHtml(input)}</strong>
                     </p>
                 `;
             }
         }
 
-        window.addEventListener("DOMContentLoaded", function () {
+
+        function checkUrlCertificate() {
 
             const params = new URLSearchParams(window.location.search);
+
             const certificateId = params.get("id");
 
             if (certificateId) {
 
-                const input = document.getElementById("certificateInput");
+                const input =
+                    document.getElementById("certificateInput");
 
                 input.value = certificateId;
 
                 verifyCertificate();
             }
+        }
 
-        });
+
+        function escapeHtml(text) {
+
+            const div = document.createElement("div");
+
+            div.textContent = text;
+
+            return div.innerHTML;
+        }
+
+
+        document
+            .getElementById("certificateInput")
+            .addEventListener("keydown", function(event) {
+
+                if (event.key === "Enter") {
+
+                    verifyCertificate();
+
+                }
+
+            });
+
+
+        loadCertificates();
 
     </script>
 
