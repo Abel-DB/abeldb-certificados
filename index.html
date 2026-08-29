@@ -142,7 +142,16 @@
             color: #8995a5;
         }
 
+        .loading {
+            color: #66758a;
+        }
+
+        .error {
+            color: #9b2226;
+        }
+
         @media (max-width: 600px) {
+
             .container {
                 padding: 35px 20px;
             }
@@ -173,210 +182,398 @@
 
 <body>
 
-    <main class="container">
+<main class="container">
 
-        <header class="brand">
-            <div class="brand-name">ABELDB</div>
-            <div class="brand-subtitle">CYBERSECURITY</div>
-            <div class="line"></div>
-        </header>
+    <header class="brand">
 
-        <h1>VERIFICACIÓN DE CERTIFICADOS</h1>
-
-        <p class="description">
-            Introduce el número de certificado para comprobar
-            su autenticidad y los datos asociados.
-        </p>
-
-        <div class="search-box">
-            <input
-                type="text"
-                id="certificateInput"
-                placeholder="Ej. ABELDB-LNX-2026-0001"
-            >
-
-            <button onclick="verifyCertificate()">
-                VERIFICAR
-            </button>
+        <div class="brand-name">
+            ABELDB
         </div>
 
-        <section class="result" id="result">
+        <div class="brand-subtitle">
+            CYBERSECURITY
+        </div>
 
-            <div class="valid">
-                CERTIFICADO VÁLIDO
-            </div>
+        <div class="line"></div>
 
-            <div class="data">
+    </header>
 
-                <div class="data-item">
-                    <span>Participante</span>
-                    <strong id="student"></strong>
-                </div>
 
-                <div class="data-item">
-                    <span>Curso</span>
-                    <strong id="course"></strong>
-                </div>
+    <h1>
+        VERIFICACIÓN DE CERTIFICADOS
+    </h1>
 
-                <div class="data-item">
-                    <span>Duración</span>
-                    <strong id="duration"></strong>
-                </div>
 
-                <div class="data-item">
-                    <span>Modalidad</span>
-                    <strong id="modality"></strong>
-                </div>
+    <p class="description">
+        Introduce el número de certificado para comprobar
+        su autenticidad y los datos asociados.
+    </p>
 
-                <div class="data-item">
-                    <span>Fecha de finalización</span>
-                    <strong id="date"></strong>
-                </div>
 
-                <div class="data-item">
-                    <span>N.º de certificado</span>
-                    <strong id="certificateNumber"></strong>
-                </div>
+    <div class="search-box">
 
-            </div>
+        <input
+            type="text"
+            id="certificateInput"
+            placeholder="Ej. ABELDB-LNX-2026-0001"
+            autocomplete="off"
+        >
 
-        </section>
+        <button onclick="verifyCertificate()">
+            VERIFICAR
+        </button>
 
-        <footer>
-            ABELDB Cybersecurity · Sistema de verificación de certificados
-        </footer>
+    </div>
 
-    </main>
 
-    <script>
+    <section
+        class="result"
+        id="result"
+    ></section>
 
-    async function verifyCertificate() {
 
-        const input = document
-            .getElementById("certificateInput")
-            .value
-            .trim()
-            .toUpperCase();
+    <footer>
+        ABELDB Cybersecurity · Sistema de verificación de certificados
+    </footer>
 
-        const result = document.getElementById("result");
+</main>
 
-        if (!input) {
-            result.style.display = "block";
-            result.innerHTML = `
-                <div class="valid">
-                    INGRESA UN NÚMERO DE CERTIFICADO
-                </div>
-            `;
-            return;
-        }
 
-        try {
+<script>
 
-            const response = await fetch("certificados.json");
+    /*
+     * URL DE NUESTRO APPS SCRIPT
+     */
+    const API_URL =
+        "https://script.google.com/macros/s/AKfycbwnGzpWKOtfmommd4o_b_gbxDml7psb8MaliVAZ7bOvn1v70JCewrJIDyIswLqff6dLyQ/exec";
 
-            if (!response.ok) {
-                throw new Error("No se pudo cargar la base de certificados.");
-            }
 
-            const certificates = await response.json();
+    /*
+     * Escapa texto para evitar que datos externos
+     * sean interpretados como HTML.
+     */
+    function escapeHTML(text) {
 
-            if (certificates[input]) {
+        return String(text ?? "")
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
 
-                const certificate = certificates[input];
-
-                result.innerHTML = `
-                    <div class="valid">
-                        CERTIFICADO VÁLIDO
-                    </div>
-
-                    <div class="data">
-
-                        <div class="data-item">
-                            <span>Participante</span>
-                            <strong>${certificate.nombre}</strong>
-                        </div>
-
-                        <div class="data-item">
-                            <span>Curso</span>
-                            <strong>${certificate.curso}</strong>
-                        </div>
-
-                        <div class="data-item">
-                            <span>Duración</span>
-                            <strong>${certificate.duracion}</strong>
-                        </div>
-
-                        <div class="data-item">
-                            <span>Modalidad</span>
-                            <strong>${certificate.modalidad}</strong>
-                        </div>
-
-                        <div class="data-item">
-                            <span>Fecha de finalización</span>
-                            <strong>${certificate.fecha}</strong>
-                        </div>
-
-                        <div class="data-item">
-                            <span>N.º de certificado</span>
-                            <strong>${input}</strong>
-                        </div>
-
-                    </div>
-                `;
-
-                result.style.display = "block";
-
-            } else {
-
-                result.innerHTML = `
-                    <div class="valid">
-                        CERTIFICADO NO ENCONTRADO
-                    </div>
-
-                    <p>
-                        No existe un certificado registrado con el número:
-                        <strong>${input}</strong>
-                    </p>
-                `;
-
-                result.style.display = "block";
-            }
-
-        } catch (error) {
-
-            result.innerHTML = `
-                <div class="valid">
-                    ERROR DE VERIFICACIÓN
-                </div>
-
-                <p>
-                    No se pudo consultar la base de certificados.
-                    Intenta nuevamente.
-                </p>
-            `;
-
-            result.style.display = "block";
-
-            console.error(error);
-        }
     }
 
 
-    window.addEventListener("DOMContentLoaded", function () {
+    /*
+     * Muestra un mensaje dentro del resultado.
+     */
+    function showMessage(title, message, className = "") {
 
-        const params = new URLSearchParams(window.location.search);
-        const certificateId = params.get("id");
+        const result =
+            document.getElementById("result");
 
-        if (certificateId) {
+        result.style.display = "block";
 
-            const input = document.getElementById("certificateInput");
+        result.innerHTML = `
+            <div class="valid ${className}">
+                ${escapeHTML(title)}
+            </div>
 
-            input.value = certificateId;
+            <p>
+                ${message}
+            </p>
+        `;
 
-            verifyCertificate();
+    }
+
+
+    /*
+     * Verifica un certificado consultando
+     * directamente nuestro Apps Script.
+     */
+    async function verifyCertificate() {
+
+        const input =
+            document
+                .getElementById("certificateInput")
+                .value
+                .trim()
+                .toUpperCase();
+
+
+        if (!input) {
+
+            showMessage(
+                "INTRODUCE UN NÚMERO DE CERTIFICADO",
+                "Escribe el número de certificado para realizar la búsqueda."
+            );
+
+            return;
         }
 
-    });
+
+        const result =
+            document.getElementById("result");
+
+
+        result.style.display = "block";
+
+
+        result.innerHTML = `
+            <div class="valid loading">
+                VERIFICANDO...
+            </div>
+
+            <p>
+                Consultando el registro de ABELDB.
+            </p>
+        `;
+
+
+        try {
+
+            const response =
+                await fetch(
+                    API_URL +
+                    "?id=" +
+                    encodeURIComponent(input)
+                );
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    "No se pudo conectar con Apps Script."
+                );
+
+            }
+
+
+            const data =
+                await response.json();
+
+
+            /*
+             * CERTIFICADO NO ENCONTRADO
+             */
+            if (!data.encontrado) {
+
+                showMessage(
+                    "CERTIFICADO NO ENCONTRADO",
+                    `
+                        No existe un certificado registrado
+                        con el número:
+                        <strong>${escapeHTML(input)}</strong>
+                    `
+                );
+
+                return;
+            }
+
+
+            const certificate =
+                data.certificado;
+
+
+            /*
+             * CERTIFICADO ENCONTRADO PERO TODAVÍA
+             * NO ESTÁ VALIDADO.
+             */
+            if (
+                String(certificate.estado)
+                    .trim()
+                    .toLowerCase() !== "válido"
+            ) {
+
+                showMessage(
+                    "CERTIFICADO NO VÁLIDO",
+                    `
+                        El certificado
+                        <strong>${escapeHTML(certificate.numero)}</strong>
+                        se encuentra actualmente en estado:
+                        <strong>${escapeHTML(certificate.estado)}</strong>.
+                    `
+                );
+
+                return;
+            }
+
+
+            /*
+             * CERTIFICADO VÁLIDO
+             */
+            result.innerHTML = `
+
+                <div class="valid">
+                    CERTIFICADO VÁLIDO
+                </div>
+
+
+                <div class="data">
+
+                    <div class="data-item">
+
+                        <span>
+                            Participante
+                        </span>
+
+                        <strong>
+                            ${escapeHTML(certificate.nombre)}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="data-item">
+
+                        <span>
+                            Curso
+                        </span>
+
+                        <strong>
+                            ${escapeHTML(certificate.curso)}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="data-item">
+
+                        <span>
+                            Duración
+                        </span>
+
+                        <strong>
+                            ${escapeHTML(certificate.duracion)}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="data-item">
+
+                        <span>
+                            Modalidad
+                        </span>
+
+                        <strong>
+                            ${escapeHTML(certificate.modalidad)}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="data-item">
+
+                        <span>
+                            Fecha de finalización
+                        </span>
+
+                        <strong>
+                            ${escapeHTML(certificate.fecha)}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="data-item">
+
+                        <span>
+                            N.º de certificado
+                        </span>
+
+                        <strong>
+                            ${escapeHTML(certificate.numero)}
+                        </strong>
+
+                    </div>
+
+                </div>
+            `;
+
+
+            result.style.display = "block";
+
+
+        } catch (error) {
+
+            console.error(error);
+
+
+            showMessage(
+                "ERROR DE VERIFICACIÓN",
+                `
+                    No fue posible consultar el registro
+                    de certificados.
+                    Inténtalo nuevamente.
+                `,
+                "error"
+            );
+
+        }
+
+    }
+
+
+    /*
+     * Permite presionar ENTER en el campo
+     * en lugar de pulsar VERIFICAR.
+     */
+    document
+        .getElementById("certificateInput")
+        .addEventListener(
+            "keydown",
+            function(event) {
+
+                if (event.key === "Enter") {
+
+                    verifyCertificate();
+
+                }
+
+            }
+        );
+
+
+    /*
+     * Si la página recibe:
+     *
+     * ?id=ABELDB-LNX-2026-0002
+     *
+     * verifica automáticamente ese certificado.
+     */
+    window.addEventListener(
+        "DOMContentLoaded",
+        function() {
+
+            const params =
+                new URLSearchParams(
+                    window.location.search
+                );
+
+
+            const certificateId =
+                params.get("id");
+
+
+            if (certificateId) {
+
+                const input =
+                    document.getElementById(
+                        "certificateInput"
+                    );
+
+
+                input.value =
+                    certificateId;
+
+
+                verifyCertificate();
+
+            }
+
+        }
+    );
 
 </script>
 
