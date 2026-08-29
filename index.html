@@ -250,75 +250,83 @@
 
     <script>
 
-        let certificates = {};
+    async function verifyCertificate() {
 
-        async function loadCertificates() {
+        const input = document
+            .getElementById("certificateInput")
+            .value
+            .trim()
+            .toUpperCase();
 
-            try {
+        const result = document.getElementById("result");
 
-                const response = await fetch("certificados.json");
-
-                if (!response.ok) {
-                    throw new Error("No se pudo cargar el registro de certificados.");
-                }
-
-                certificates = await response.json();
-
-                checkUrlCertificate();
-
-            } catch (error) {
-
-                console.error(error);
-
-                const result = document.getElementById("result");
-
-                result.style.display = "block";
-
-                result.innerHTML = `
-                    <div class="valid">
-                        ERROR DEL SISTEMA
-                    </div>
-
-                    <p>
-                        No fue posible cargar el registro de certificados.
-                        Intenta nuevamente más tarde.
-                    </p>
-                `;
-            }
+        if (!input) {
+            result.style.display = "block";
+            result.innerHTML = `
+                <div class="valid">
+                    INGRESA UN NÚMERO DE CERTIFICADO
+                </div>
+            `;
+            return;
         }
 
+        try {
 
-        function verifyCertificate() {
+            const response = await fetch("certificados.json");
 
-            const input = document
-                .getElementById("certificateInput")
-                .value
-                .trim()
-                .toUpperCase();
+            if (!response.ok) {
+                throw new Error("No se pudo cargar la base de certificados.");
+            }
 
-            const result = document.getElementById("result");
+            const certificates = await response.json();
 
-            if (!input) {
+            if (certificates[input]) {
 
-                result.style.display = "block";
+                const certificate = certificates[input];
 
                 result.innerHTML = `
                     <div class="valid">
-                        INGRESA UN NÚMERO DE CERTIFICADO
+                        CERTIFICADO VÁLIDO
                     </div>
 
-                    <p>
-                        Introduce el número de certificado para realizar la verificación.
-                    </p>
+                    <div class="data">
+
+                        <div class="data-item">
+                            <span>Participante</span>
+                            <strong>${certificate.nombre}</strong>
+                        </div>
+
+                        <div class="data-item">
+                            <span>Curso</span>
+                            <strong>${certificate.curso}</strong>
+                        </div>
+
+                        <div class="data-item">
+                            <span>Duración</span>
+                            <strong>${certificate.duracion}</strong>
+                        </div>
+
+                        <div class="data-item">
+                            <span>Modalidad</span>
+                            <strong>${certificate.modalidad}</strong>
+                        </div>
+
+                        <div class="data-item">
+                            <span>Fecha de finalización</span>
+                            <strong>${certificate.fecha}</strong>
+                        </div>
+
+                        <div class="data-item">
+                            <span>N.º de certificado</span>
+                            <strong>${input}</strong>
+                        </div>
+
+                    </div>
                 `;
 
-                return;
-            }
-
-
-            if (!certificates[input]) {
-
                 result.style.display = "block";
+
+            } else {
 
                 result.innerHTML = `
                     <div class="valid">
@@ -327,172 +335,50 @@
 
                     <p>
                         No existe un certificado registrado con el número:
-                        <strong>${escapeHtml(input)}</strong>
+                        <strong>${input}</strong>
                     </p>
                 `;
-
-                return;
-            }
-
-
-            const certificate = certificates[input];
-
-            const estado = certificate.estado
-                ? certificate.estado.toLowerCase()
-                : "válido";
-
-
-            if (estado === "anulado") {
 
                 result.style.display = "block";
-
-                result.innerHTML = `
-                    <div class="valid">
-                        CERTIFICADO ANULADO
-                    </div>
-
-                    <p>
-                        El certificado
-                        <strong>${escapeHtml(input)}</strong>
-                        se encuentra registrado, pero actualmente está anulado.
-                    </p>
-
-                    <div class="data">
-
-                        <div class="data-item">
-                            <span>Participante</span>
-                            <strong>${escapeHtml(certificate.nombre)}</strong>
-                        </div>
-
-                        <div class="data-item">
-                            <span>Curso</span>
-                            <strong>${escapeHtml(certificate.curso)}</strong>
-                        </div>
-
-                        <div class="data-item">
-                            <span>N.º de certificado</span>
-                            <strong>${escapeHtml(input)}</strong>
-                        </div>
-
-                        <div class="data-item">
-                            <span>Estado</span>
-                            <strong>ANULADO</strong>
-                        </div>
-
-                    </div>
-                `;
-
-                return;
             }
 
+        } catch (error) {
 
             result.innerHTML = `
                 <div class="valid">
-                    CERTIFICADO VÁLIDO
+                    ERROR DE VERIFICACIÓN
                 </div>
 
-                <div class="data">
-
-                    <div class="data-item">
-                        <span>Participante</span>
-                        <strong id="student"></strong>
-                    </div>
-
-                    <div class="data-item">
-                        <span>Curso</span>
-                        <strong id="course"></strong>
-                    </div>
-
-                    <div class="data-item">
-                        <span>Duración</span>
-                        <strong id="duration"></strong>
-                    </div>
-
-                    <div class="data-item">
-                        <span>Modalidad</span>
-                        <strong id="modality"></strong>
-                    </div>
-
-                    <div class="data-item">
-                        <span>Fecha de finalización</span>
-                        <strong id="date"></strong>
-                    </div>
-
-                    <div class="data-item">
-                        <span>N.º de certificado</span>
-                        <strong id="certificateNumber"></strong>
-                    </div>
-
-                </div>
+                <p>
+                    No se pudo consultar la base de certificados.
+                    Intenta nuevamente.
+                </p>
             `;
 
-
-            document.getElementById("student").textContent =
-                certificate.nombre;
-
-            document.getElementById("course").textContent =
-                certificate.curso;
-
-            document.getElementById("duration").textContent =
-                certificate.duracion;
-
-            document.getElementById("modality").textContent =
-                certificate.modalidad;
-
-            document.getElementById("date").textContent =
-                certificate.fecha;
-
-            document.getElementById("certificateNumber").textContent =
-                input;
-
             result.style.display = "block";
+
+            console.error(error);
+        }
+    }
+
+
+    window.addEventListener("DOMContentLoaded", function () {
+
+        const params = new URLSearchParams(window.location.search);
+        const certificateId = params.get("id");
+
+        if (certificateId) {
+
+            const input = document.getElementById("certificateInput");
+
+            input.value = certificateId;
+
+            verifyCertificate();
         }
 
+    });
 
-        function checkUrlCertificate() {
-
-            const params = new URLSearchParams(window.location.search);
-
-            const certificateId = params.get("id");
-
-            if (certificateId) {
-
-                const input =
-                    document.getElementById("certificateInput");
-
-                input.value = certificateId;
-
-                verifyCertificate();
-            }
-        }
-
-
-        function escapeHtml(text) {
-
-            const div = document.createElement("div");
-
-            div.textContent = text;
-
-            return div.innerHTML;
-        }
-
-
-        document
-            .getElementById("certificateInput")
-            .addEventListener("keydown", function(event) {
-
-                if (event.key === "Enter") {
-
-                    verifyCertificate();
-
-                }
-
-            });
-
-
-        loadCertificates();
-
-    </script>
+</script>
 
 </body>
 </html>
