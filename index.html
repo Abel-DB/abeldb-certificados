@@ -316,72 +316,8 @@
             }
 
 
-            if (certificates[input]) {
-    
-                const certificate = certificates[input];
+            if (!certificates[input]) {
 
-                result.innerHTML = `
-                    <div class="valid">
-                        CERTIFICADO VÁLIDO
-                    </div>
-
-                    <div class="data">
-
-                        <div class="data-item">
-                            <span>Participante</span>
-                            <strong id="student"></strong>
-                        </div>
-
-                        <div class="data-item">
-                            <span>Curso</span>
-                            <strong id="course"></strong>
-                        </div>
-
-                        <div class="data-item">
-                            <span>Duración</span>
-                            <strong id="duration"></strong>
-                        </div>
-
-                        <div class="data-item">
-                            <span>Modalidad</span>
-                            <strong id="modality"></strong>
-                        </div>
-
-                        <div class="data-item">
-                            <span>Fecha de finalización</span>
-                            <strong id="date"></strong>
-                        </div>
-
-                        <div class="data-item">
-                            <span>N.º de certificado</span>
-                            <strong id="certificateNumber"></strong>
-                        </div>
-
-                    </div>
-                `;
-
-                document.getElementById("student").textContent =
-                    certificate.nombre;
-
-                document.getElementById("course").textContent =
-                    certificate.curso;
-
-                document.getElementById("duration").textContent =
-                    certificate.duracion;
-
-                document.getElementById("modality").textContent =
-                    certificate.modalidad;
-
-                document.getElementById("date").textContent =
-                    certificate.fecha;
-
-                document.getElementById("certificateNumber").textContent =
-                    input;
-
-                result.style.display = "block";
-
-            } else {
-    
                 result.style.display = "block";
 
                 result.innerHTML = `
@@ -394,7 +330,122 @@
                         <strong>${escapeHtml(input)}</strong>
                     </p>
                 `;
+
+                return;
             }
+
+
+            const certificate = certificates[input];
+
+            const estado = certificate.estado
+                ? certificate.estado.toLowerCase()
+                : "válido";
+
+
+            if (estado === "anulado") {
+
+                result.style.display = "block";
+
+                result.innerHTML = `
+                    <div class="valid">
+                        CERTIFICADO ANULADO
+                    </div>
+
+                    <p>
+                        El certificado
+                        <strong>${escapeHtml(input)}</strong>
+                        se encuentra registrado, pero actualmente está anulado.
+                    </p>
+
+                    <div class="data">
+
+                        <div class="data-item">
+                            <span>Participante</span>
+                            <strong>${escapeHtml(certificate.nombre)}</strong>
+                        </div>
+
+                        <div class="data-item">
+                            <span>Curso</span>
+                            <strong>${escapeHtml(certificate.curso)}</strong>
+                        </div>
+
+                        <div class="data-item">
+                            <span>N.º de certificado</span>
+                            <strong>${escapeHtml(input)}</strong>
+                        </div>
+
+                        <div class="data-item">
+                            <span>Estado</span>
+                            <strong>ANULADO</strong>
+                        </div>
+
+                    </div>
+                `;
+
+                return;
+            }
+
+
+            result.innerHTML = `
+                <div class="valid">
+                    CERTIFICADO VÁLIDO
+                </div>
+
+                <div class="data">
+
+                    <div class="data-item">
+                        <span>Participante</span>
+                        <strong id="student"></strong>
+                    </div>
+
+                    <div class="data-item">
+                        <span>Curso</span>
+                        <strong id="course"></strong>
+                    </div>
+
+                    <div class="data-item">
+                        <span>Duración</span>
+                        <strong id="duration"></strong>
+                    </div>
+
+                    <div class="data-item">
+                        <span>Modalidad</span>
+                        <strong id="modality"></strong>
+                    </div>
+
+                    <div class="data-item">
+                        <span>Fecha de finalización</span>
+                        <strong id="date"></strong>
+                    </div>
+
+                    <div class="data-item">
+                        <span>N.º de certificado</span>
+                        <strong id="certificateNumber"></strong>
+                    </div>
+
+                </div>
+            `;
+
+
+            document.getElementById("student").textContent =
+                certificate.nombre;
+
+            document.getElementById("course").textContent =
+                certificate.curso;
+
+            document.getElementById("duration").textContent =
+                certificate.duracion;
+
+            document.getElementById("modality").textContent =
+                certificate.modalidad;
+
+            document.getElementById("date").textContent =
+                certificate.fecha;
+
+            document.getElementById("certificateNumber").textContent =
+                input;
+
+            result.style.display = "block";
         }
 
 
