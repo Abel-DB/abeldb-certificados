@@ -1,496 +1,785 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>ABELDB Cybersecurity | Verificación de Certificados</title>
+  <title>Verificación de Certificados | ABELDB Cybersecurity</title>
 
-    <style>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f5f7fb;
+      color: #1b2b44;
+    }
 
-        body {
-            font-family: Arial, Helvetica, sans-serif;
-            background: #f7f9fc;
-            color: #10243e;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 30px;
-        }
+    .contenedor {
+      width: 100%;
+      max-width: 900px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
 
-        .container {
-            width: 100%;
-            max-width: 850px;
-            background: white;
-            border: 1px solid #e3e8ef;
-            padding: 60px;
-        }
+    .tarjeta-principal {
+      background: #ffffff;
+      border: 1px solid #dbe1ea;
+      padding: 55px 60px;
+      text-align: center;
+    }
 
-        .brand {
-            text-align: center;
-            margin-bottom: 45px;
-        }
+    .logo {
+      font-size: 34px;
+      font-weight: 700;
+      letter-spacing: 8px;
+      color: #1b2b44;
+      margin-bottom: 10px;
+    }
 
-        .brand-name {
-            font-size: 34px;
-            font-weight: 700;
-            letter-spacing: 8px;
-            color: #10243e;
-        }
+    .sublogo {
+      font-size: 14px;
+      letter-spacing: 6px;
+      color: #526784;
+      margin-bottom: 25px;
+    }
 
-        .brand-subtitle {
-            margin-top: 12px;
-            font-size: 13px;
-            letter-spacing: 6px;
-            color: #40536d;
-        }
+    .linea {
+      width: 70px;
+      height: 3px;
+      background: #5874ff;
+      margin: 0 auto 45px auto;
+    }
 
-        .line {
-            width: 70px;
-            height: 3px;
-            background: #5875ff;
-            margin: 20px auto 0;
-        }
+    h1 {
+      margin: 0;
+      font-size: 30px;
+      letter-spacing: 2px;
+      color: #1b2b44;
+    }
 
-        h1 {
-            text-align: center;
-            font-size: 30px;
-            letter-spacing: 2px;
-            margin-bottom: 15px;
-        }
+    .descripcion {
+      margin: 18px 0 35px;
+      color: #687991;
+      font-size: 16px;
+      line-height: 1.6;
+    }
 
-        .description {
-            text-align: center;
-            color: #66758a;
-            font-size: 16px;
-            line-height: 1.7;
-            margin-bottom: 35px;
-        }
+    .buscador {
+      display: flex;
+      max-width: 600px;
+      margin: 0 auto 40px;
+    }
 
-        .search-box {
-            display: flex;
-            max-width: 600px;
-            margin: 0 auto;
-        }
+    .buscador input {
+      flex: 1;
+      height: 52px;
+      border: 1px solid #cbd4e0;
+      border-right: none;
+      padding: 0 16px;
+      font-size: 15px;
+      outline: none;
+    }
 
-        input {
-            flex: 1;
-            padding: 16px;
-            border: 1px solid #ccd4df;
-            font-size: 15px;
-            outline: none;
-        }
+    .buscador input:focus {
+      border-color: #5874ff;
+    }
 
-        input:focus {
-            border-color: #5875ff;
-        }
+    .buscador button {
+      width: 130px;
+      border: none;
+      background: #1b2b44;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 14px;
+    }
 
-        button {
-            padding: 16px 25px;
-            border: none;
-            background: #10243e;
-            color: white;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-        }
+    .buscador button:hover {
+      background: #263b5b;
+    }
 
-        button:hover {
-            background: #1b3657;
-        }
+    .resultado {
+      display: none;
+      border: 1px solid #d6deea;
+      padding: 32px;
+      text-align: left;
+      margin-top: 20px;
+    }
 
-        .result {
-            display: none;
-            margin-top: 40px;
-            padding: 30px;
-            border: 1px solid #dfe5ec;
-        }
+    .resultado h2 {
+      text-align: center;
+      margin: 0 0 28px;
+      font-size: 22px;
+    }
 
-        .status {
-            font-size: 22px;
-            font-weight: 700;
-            margin-bottom: 25px;
-            text-align: center;
-        }
+    .valido {
+      color: #207a43;
+    }
 
-        .status.valid {
-            color: #176b3a;
-        }
+    .pendiente {
+      color: #b36b00;
+    }
 
-        .status.invalid {
-            color: #a52828;
-        }
+    .anulado {
+      color: #b42318;
+    }
 
-        .data {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
+    .estado {
+      text-align: center;
+      font-size: 22px;
+      font-weight: bold;
+      margin-bottom: 30px;
+    }
 
-        .data-item span {
-            display: block;
-            color: #738198;
-            font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 5px;
-        }
+    .datos {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 25px 45px;
+    }
 
-        .data-item strong {
-            font-size: 16px;
-        }
+    .dato-etiqueta {
+      display: block;
+      color: #71819a;
+      font-size: 13px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
 
-        .loading {
-            text-align: center;
-            color: #66758a;
-        }
+    .dato-valor {
+      display: block;
+      color: #1b2b44;
+      font-size: 16px;
+      font-weight: bold;
+      word-break: break-word;
+    }
 
-        footer {
-            margin-top: 45px;
-            font-size: 12px;
-            color: #8995a5;
-            text-align: center;
-        }
+    .mensaje {
+      display: none;
+      padding: 22px;
+      border: 1px solid #e0e5ec;
+      text-align: center;
+      color: #687991;
+      margin-top: 20px;
+    }
 
-        @media (max-width: 600px) {
+    .mensaje.error {
+      color: #b42318;
+      border-color: #efc5c1;
+      background: #fff8f7;
+    }
 
-            .container {
-                padding: 35px 20px;
-            }
+    .acciones {
+      display: none;
+      text-align: center;
+      margin-top: 28px;
+    }
 
-            .brand-name {
-                font-size: 25px;
-                letter-spacing: 5px;
-            }
+    .boton-imprimir {
+      border: none;
+      background: #1b2b44;
+      color: white;
+      padding: 13px 24px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+    }
 
-            h1 {
-                font-size: 24px;
-            }
+    .boton-imprimir:hover {
+      background: #263b5b;
+    }
 
-            .search-box {
-                flex-direction: column;
-            }
+    footer {
+      text-align: center;
+      color: #8492a8;
+      font-size: 13px;
+      margin-top: 35px;
+    }
 
-            button {
-                margin-top: 10px;
-            }
+    .cargando {
+      display: none;
+      text-align: center;
+      color: #687991;
+      margin: 20px 0;
+    }
 
-            .data {
-                grid-template-columns: 1fr;
-            }
+    @media (max-width: 650px) {
 
-        }
+      .contenedor {
+        margin: 15px auto;
+        padding: 0 10px;
+      }
 
-    </style>
+      .tarjeta-principal {
+        padding: 35px 20px;
+      }
 
+      .logo {
+        font-size: 27px;
+        letter-spacing: 5px;
+      }
+
+      .sublogo {
+        font-size: 11px;
+        letter-spacing: 4px;
+      }
+
+      h1 {
+        font-size: 23px;
+      }
+
+      .buscador {
+        display: block;
+      }
+
+      .buscador input {
+        width: 100%;
+        border-right: 1px solid #cbd4e0;
+        margin-bottom: 10px;
+      }
+
+      .buscador button {
+        width: 100%;
+        height: 50px;
+      }
+
+      .datos {
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+
+      .resultado {
+        padding: 25px 18px;
+      }
+    }
+
+    @media print {
+
+      body {
+        background: white;
+      }
+
+      .contenedor {
+        margin: 0;
+        max-width: 100%;
+      }
+
+      .tarjeta-principal {
+        border: none;
+        padding: 20px;
+      }
+
+      .buscador,
+      .descripcion,
+      .acciones,
+      footer {
+        display: none !important;
+      }
+
+      .resultado {
+        display: block !important;
+        border: 1px solid #ccc;
+      }
+    }
+  </style>
 </head>
 
 <body>
 
-<main class="container">
+  <div class="contenedor">
 
-    <header class="brand">
+    <div class="tarjeta-principal">
 
-        <div class="brand-name">
-            ABELDB
-        </div>
+      <div class="logo">ABELDB</div>
 
-        <div class="brand-subtitle">
-            CYBERSECURITY
-        </div>
+      <div class="sublogo">
+        CYBERSECURITY
+      </div>
 
-        <div class="line"></div>
+      <div class="linea"></div>
 
-    </header>
-
-
-    <h1>
+      <h1>
         VERIFICACIÓN DE CERTIFICADOS
-    </h1>
+      </h1>
 
-
-    <p class="description">
+      <p class="descripcion">
         Introduce el número de certificado para comprobar
         su autenticidad y los datos asociados.
-    </p>
+      </p>
 
-
-    <div class="search-box">
+      <div class="buscador">
 
         <input
-            type="text"
-            id="certificateInput"
-            placeholder="Ej. ABELDB-LNX-2026-0002"
+          type="text"
+          id="numeroCertificado"
+          placeholder="Ej. ABELDB-LNX-2026-0001"
         >
 
-        <button onclick="verifyCertificate()">
-            VERIFICAR
+        <button onclick="verificarCertificado()">
+          VERIFICAR
         </button>
+
+      </div>
+
+      <div id="cargando" class="cargando">
+        Consultando certificado...
+      </div>
+
+      <div id="mensaje" class="mensaje"></div>
+
+      <div id="resultado" class="resultado">
+
+        <div id="estado" class="estado">
+          CERTIFICADO VÁLIDO
+        </div>
+
+        <div class="datos">
+
+          <div>
+            <span class="dato-etiqueta">
+              Participante
+            </span>
+
+            <span
+              class="dato-valor"
+              id="nombre"
+            ></span>
+          </div>
+
+          <div>
+            <span class="dato-etiqueta">
+              Curso
+            </span>
+
+            <span
+              class="dato-valor"
+              id="curso"
+            ></span>
+          </div>
+
+          <div>
+            <span class="dato-etiqueta">
+              Duración
+            </span>
+
+            <span
+              class="dato-valor"
+              id="duracion"
+            ></span>
+          </div>
+
+          <div>
+            <span class="dato-etiqueta">
+              Modalidad
+            </span>
+
+            <span
+              class="dato-valor"
+              id="modalidad"
+            ></span>
+          </div>
+
+          <div>
+            <span class="dato-etiqueta">
+              Fecha de finalización
+            </span>
+
+            <span
+              class="dato-valor"
+              id="fecha"
+            ></span>
+          </div>
+
+          <div>
+            <span class="dato-etiqueta">
+              N.º de certificado
+            </span>
+
+            <span
+              class="dato-valor"
+              id="numero"
+            ></span>
+          </div>
+
+        </div>
+
+      </div>
+
+      <div id="acciones" class="acciones">
+
+        <button
+          class="boton-imprimir"
+          onclick="window.print()"
+        >
+          IMPRIMIR / GUARDAR PDF
+        </button>
+
+      </div>
+
+      <footer>
+        ABELDB Cybersecurity · Sistema de verificación de certificados
+      </footer>
 
     </div>
 
-
-    <section
-        class="result"
-        id="result">
-    </section>
+  </div>
 
 
-    <footer>
-        ABELDB Cybersecurity · Sistema de verificación de certificados
-    </footer>
+  <script>
 
-</main>
-
-
-<script>
+    /*
+     * URL DE TU APLICACIÓN WEB DE GOOGLE APPS SCRIPT
+     */
 
     const API_URL =
-        "https://script.google.com/macros/s/AKfycbwnGzpWKOtfmommd4o_b_gbxDml7psb8MaliVAZ7bOvn1v70JCewrJIDyIswLqff6dLyQ/exec";
+      "https://script.google.com/macros/s/AKfycbwnGzpWKOtfmommd4o_b_gbxDml7psb8MaliVAZ7bOvn1v70JCewrJIDyIswLqff6dLyQ/exec";
 
 
-    async function verifyCertificate() {
+    /*
+     * VERIFICAR CERTIFICADO
+     */
 
-        const input =
-            document
-                .getElementById("certificateInput")
-                .value
-                .trim()
-                .toUpperCase();
+    async function verificarCertificado() {
 
+      const input =
+        document.getElementById("numeroCertificado");
 
-        const result =
-            document.getElementById("result");
+      const numero =
+        input.value.trim();
 
+      const resultado =
+        document.getElementById("resultado");
 
-        if (!input) {
+      const mensaje =
+        document.getElementById("mensaje");
 
-            result.style.display = "block";
+      const cargando =
+        document.getElementById("cargando");
 
-            result.innerHTML = `
-                <div class="status invalid">
-                    INTRODUCE UN NÚMERO DE CERTIFICADO
-                </div>
-            `;
-
-            return;
-
-        }
+      const acciones =
+        document.getElementById("acciones");
 
 
-        result.style.display = "block";
-
-        result.innerHTML = `
-            <div class="loading">
-                Verificando certificado...
-            </div>
-        `;
+      resultado.style.display = "none";
+      mensaje.style.display = "none";
+      acciones.style.display = "none";
 
 
-        try {
+      if (!numero) {
 
-            const response =
-                await fetch(
-                    API_URL +
-                    "?id=" +
-                    encodeURIComponent(input)
-                );
+        mostrarMensaje(
+          "Introduce un número de certificado.",
+          true
+        );
 
-
-            const data =
-                await response.json();
+        return;
+      }
 
 
-            if (!data.encontrado) {
-
-                result.innerHTML = `
-                    <div class="status invalid">
-                        CERTIFICADO NO ENCONTRADO
-                    </div>
-
-                    <p style="text-align:center;">
-                        No existe un certificado registrado
-                        con el número:
-                        <strong>${escapeHTML(input)}</strong>
-                    </p>
-                `;
-
-                return;
-
-            }
+      cargando.style.display = "block";
 
 
-            const certificado =
-                data.certificado;
+      try {
+
+        const respuesta =
+          await fetch(
+            API_URL +
+            "?id=" +
+            encodeURIComponent(numero)
+          );
 
 
-            if (
-                String(certificado.estado)
-                    .trim()
-                    .toLowerCase() !== "válido"
-            ) {
+        if (!respuesta.ok) {
 
-                result.innerHTML = `
-                    <div class="status invalid">
-                        CERTIFICADO NO VÁLIDO
-                    </div>
-
-                    <p style="text-align:center;">
-                        El certificado se encuentra en estado:
-                        <strong>
-                            ${escapeHTML(certificado.estado)}
-                        </strong>
-                    </p>
-                `;
-
-                return;
-
-            }
-
-
-            result.innerHTML = `
-
-                <div class="status valid">
-                    CERTIFICADO VÁLIDO
-                </div>
-
-
-                <div class="data">
-
-                    <div class="data-item">
-                        <span>Participante</span>
-                        <strong>
-                            ${escapeHTML(certificado.nombre)}
-                        </strong>
-                    </div>
-
-
-                    <div class="data-item">
-                        <span>Curso</span>
-                        <strong>
-                            ${escapeHTML(certificado.curso)}
-                        </strong>
-                    </div>
-
-
-                    <div class="data-item">
-                        <span>Duración</span>
-                        <strong>
-                            ${escapeHTML(certificado.duracion)}
-                        </strong>
-                    </div>
-
-
-                    <div class="data-item">
-                        <span>Modalidad</span>
-                        <strong>
-                            ${escapeHTML(certificado.modalidad)}
-                        </strong>
-                    </div>
-
-
-                    <div class="data-item">
-                        <span>Fecha de finalización</span>
-                        <strong>
-                            ${escapeHTML(certificado.fecha || "No registrada")}
-                        </strong>
-                    </div>
-
-
-                    <div class="data-item">
-                        <span>N.º de certificado</span>
-                        <strong>
-                            ${escapeHTML(certificado.numero)}
-                        </strong>
-                    </div>
-
-                </div>
-
-            `;
-
-
-        } catch (error) {
-
-            console.error(error);
-
-            result.innerHTML = `
-
-                <div class="status invalid">
-                    ERROR DE VERIFICACIÓN
-                </div>
-
-                <p style="text-align:center;">
-                    No fue posible consultar el sistema
-                    de verificación.
-                </p>
-
-            `;
+          throw new Error(
+            "No se pudo conectar con el servidor."
+          );
 
         }
 
-    }
+
+        const datos =
+          await respuesta.json();
 
 
-    function escapeHTML(text) {
-
-        return String(text ?? "")
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/"/g, "&quot;")
-            .replace(/'/g, "&#039;");
-
-    }
+        cargando.style.display = "none";
 
 
-    document
-        .getElementById("certificateInput")
-        .addEventListener(
-            "keydown",
-            function(event) {
+        if (!datos.encontrado) {
 
-                if (event.key === "Enter") {
-                    verifyCertificate();
-                }
+          mostrarMensaje(
+            "Certificado no encontrado. Verifica que el número sea correcto.",
+            true
+          );
 
-            }
+          return;
+        }
+
+
+        mostrarCertificado(
+          datos.certificado
         );
 
 
-    window.addEventListener(
-        "DOMContentLoaded",
-        function() {
+      } catch (error) {
 
-            const params =
-                new URLSearchParams(
-                    window.location.search
-                );
+        cargando.style.display = "none";
 
-            const certificateId =
-                params.get("id");
+        mostrarMensaje(
+          "No fue posible consultar el certificado. Inténtalo nuevamente.",
+          true
+        );
+
+        console.error(error);
+      }
+
+    }
 
 
-            if (certificateId) {
+    /*
+     * MOSTRAR CERTIFICADO
+     */
 
-                document
-                    .getElementById("certificateInput")
-                    .value = certificateId;
+    function mostrarCertificado(certificado) {
 
-                verifyCertificate();
+      const resultado =
+        document.getElementById("resultado");
 
-            }
+      const estado =
+        document.getElementById("estado");
+
+
+      document.getElementById("nombre").textContent =
+        certificado.nombre || "No registrado";
+
+
+      document.getElementById("curso").textContent =
+        certificado.curso || "No registrado";
+
+
+      document.getElementById("duracion").textContent =
+        certificado.duracion || "No registrada";
+
+
+      document.getElementById("modalidad").textContent =
+        certificado.modalidad || "No registrada";
+
+
+      document.getElementById("numero").textContent =
+        certificado.numero || "No registrado";
+
+
+      document.getElementById("fecha").textContent =
+        formatearFecha(certificado.fecha);
+
+
+      const estadoTexto =
+        String(certificado.estado || "")
+          .trim()
+          .toLowerCase();
+
+
+      estado.className = "estado";
+
+
+      if (estadoTexto === "válido" ||
+          estadoTexto === "valido") {
+
+        estado.textContent =
+          "CERTIFICADO VÁLIDO";
+
+        estado.classList.add("valido");
+
+      }
+
+      else if (estadoTexto === "pendiente") {
+
+        estado.textContent =
+          "CERTIFICADO PENDIENTE";
+
+        estado.classList.add("pendiente");
+
+      }
+
+      else if (estadoTexto === "anulado") {
+
+        estado.textContent =
+          "CERTIFICADO ANULADO";
+
+        estado.classList.add("anulado");
+
+      }
+
+      else {
+
+        estado.textContent =
+          "ESTADO: " +
+          (certificado.estado || "DESCONOCIDO");
+
+      }
+
+
+      resultado.style.display = "block";
+
+
+      /*
+       * El botón de impresión solamente aparece
+       * cuando existe un certificado.
+       */
+
+      document.getElementById("acciones")
+        .style.display = "block";
+
+    }
+
+
+    /*
+     * FECHA
+     */
+
+    function formatearFecha(fecha) {
+
+      if (!fecha) {
+        return "No registrada";
+      }
+
+
+      /*
+       * Google Apps Script puede devolver
+       * fechas en distintos formatos.
+       */
+
+      const texto =
+        String(fecha).trim();
+
+
+      if (!texto) {
+        return "No registrada";
+      }
+
+
+      /*
+       * Si ya viene como DD/MM/YYYY
+       */
+
+      if (
+        /^\d{2}\/\d{2}\/\d{4}$/.test(texto)
+      ) {
+
+        return texto;
+
+      }
+
+
+      /*
+       * Si viene como YYYY-MM-DD
+       */
+
+      if (
+        /^\d{4}-\d{2}-\d{2}$/.test(texto)
+      ) {
+
+        const partes =
+          texto.split("-");
+
+        return (
+          partes[2] +
+          "/" +
+          partes[1] +
+          "/" +
+          partes[0]
+        );
+
+      }
+
+
+      return texto;
+
+    }
+
+
+    /*
+     * MENSAJES
+     */
+
+    function mostrarMensaje(texto, error) {
+
+      const mensaje =
+        document.getElementById("mensaje");
+
+      mensaje.textContent =
+        texto;
+
+      mensaje.className =
+        error
+          ? "mensaje error"
+          : "mensaje";
+
+      mensaje.style.display =
+        "block";
+
+    }
+
+
+    /*
+     * ENTER EN EL BUSCADOR
+     */
+
+    document
+      .getElementById("numeroCertificado")
+      .addEventListener(
+        "keydown",
+        function(event) {
+
+          if (event.key === "Enter") {
+
+            verificarCertificado();
+
+          }
 
         }
+      );
+
+
+    /*
+     * CARGA AUTOMÁTICA DEL CERTIFICADO
+     *
+     * Ejemplo:
+     *
+     * ?id=ABELDB-LNX-2026-0002
+     */
+
+    window.addEventListener(
+      "DOMContentLoaded",
+      function() {
+
+        const parametros =
+          new URLSearchParams(
+            window.location.search
+          );
+
+        const id =
+          parametros.get("id");
+
+
+        if (id) {
+
+          document
+            .getElementById("numeroCertificado")
+            .value = id;
+
+          verificarCertificado();
+
+        }
+
+      }
     );
 
-</script>
+  </script>
 
 </body>
 </html>
